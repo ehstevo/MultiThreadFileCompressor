@@ -20,6 +20,19 @@ file(GLOB SRC_FILES src/*.cpp)
 # Main executable
 add_executable(MultiThreadCompressor ${SRC_FILES})
 
+include(FetchContent)
+
+# Fetch GoogleTest
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+# For older CMake versions
+set(BUILD_GMOCK OFF CACHE BOOL "Builds the googlemock subproject" FORCE)
+set(INSTALL_GTEST OFF CACHE BOOL "Disable installation" FORCE)
+
+FetchContent_MakeAvailable(googletest)
+
 # Enable testing
-# enable_testing()
-# add_subdirectory(tests)
+enable_testing()
+add_subdirectory(tests)

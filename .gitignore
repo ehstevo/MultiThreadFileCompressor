@@ -16,3 +16,10 @@
 # OS files
 .DS_Store
 Thumbs.db
+
+# CMake generated
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+Testing/
