@@ -5,6 +5,7 @@ add_executable(runTests ${TEST_SRC_FILES})
 # Link test executable with GoogleTest and your main project
 target_link_libraries(runTests
     PRIVATE
+    core
     gtest
     gtest_main
     pthread

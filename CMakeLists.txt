@@ -11,14 +11,19 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
-# Include directories
-include_directories(${PROJECT_SOURCE_DIR}/include)
+# Create a static library for your core logic
+add_library(core STATIC
+    src/file_io.cpp
+)
 
-# Add source files
-file(GLOB SRC_FILES src/*.cpp)
+target_include_directories(core PUBLIC
+    ${PROJECT_SOURCE_DIR}/include
+)
 
-# Main executable
-add_executable(MultiThreadCompressor ${SRC_FILES})
+# Main executable (links against the core library)
+add_executable(MultiThreadCompressor src/main.cpp)
+target_link_libraries(MultiThreadCompressor PRIVATE core)
+
 
 include(FetchContent)
 
