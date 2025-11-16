@@ -11,9 +11,10 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
-# Create a static library for your core logic
+# Create a static library for core logic
 add_library(core STATIC
     src/file_io.cpp
+    src/chunker.cpp
 )
 
 target_include_directories(core PUBLIC
