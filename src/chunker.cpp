@@ -2,14 +2,15 @@
 #include <stdexcept>
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 std::vector<Chunk> Chunker::split(const std::vector<uint8_t>& input) {
-    if (input.empty()) {
-        throw std::runtime_error("Input file is empty");
-    }
-    size_t input_size = input.size();
-    size_t num_chunks = std::ceil(input_size / chunk_size); // number of chunks to create
     std::vector<Chunk> chunks;
+    if (input.empty()) {
+        return chunks;
+    }
+    float input_size = input.size();
+    float num_chunks = std::ceil(input_size/chunk_size); // number of chunks to create
 
     for (size_t i=0; i<num_chunks; i++) {
         Chunk temp;
