@@ -1,0 +1,67 @@
+#pragma once
+
+#include "compressor.h"
+#include <vector>
+#include <cstdint>
+#include <unordered_map>
+#include <string>
+#include <memory>
+#include <queue>
+
+struct HuffmanNode {
+    uint8_t byte;
+    unsigned int freq;
+    HuffmanNode* left;
+    HuffmanNode* right;
+
+    // leaf node
+    HuffmanNode(uint8_t b, size_t f)
+                : byte(b), freq(f), left(nullptr), right(nullptr) {}
+
+    struct Compare {
+        bool operator()(const HuffmanNode* a,
+                        const HuffmanNode* b) const {
+                            return a->freq > b->freq;
+                        }
+    };
+};
+
+class Huffman : public Compressor {
+    public:
+
+    Huffman() = default;
+    ~Huffman() = default;
+    // override compression interface functions
+    virtual std::vector<uint8_t> compress(const std::vector<uint8_t>& chunk) override;
+    virtual std::vector<uint8_t> decompress(const std::vector<uint8_t>& chunk) override;
+
+    // build table mapping frequencies of each byte
+    void buildFrequencyTable(const std::vector<uint8_t>& chunk);
+
+    // builds huffman tree from frequency table according to huffman coding algorithm
+    void buildHuffmanTree();
+
+    // generates bitstrings for each bytes huffman code
+    void generateCodes(HuffmanNode* node, std::string& current);
+
+    // produces the compressed huffman coding of the uncompressed chunk
+    std::vector<uint8_t> encodeData(const std::vector<uint8_t>& chunk, std::unordered_map<uint8_t, std::string> codes);
+
+    // transforms the compressed data back to the original based on the generated huffman codes
+    std::vector<uint8_t> decodeData(const std::vector<uint8_t>& chunk, const std::unique_ptr<HuffmanNode> root, size_t original_size);
+
+    void serializeTree(const HuffmanNode* node, std::vector<uint8_t>& out);
+    std::unique_ptr<HuffmanNode> deserializeTree(const std::vector<uint8_t>& data, size_t& index);
+
+    // getters
+    HuffmanNode* getRoot();
+    std::unordered_map<uint8_t, int> getFrequencyTable();
+    std::unordered_map<uint8_t, std::string> getHuffmanCodes();
+
+    private:
+
+    HuffmanNode* root;
+    std::unordered_map<uint8_t, int> frequency_table;
+    std::unordered_map<uint8_t, std::string> huffman_codes;
+
+};

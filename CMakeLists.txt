@@ -15,6 +15,7 @@ endif()
 add_library(core STATIC
     src/file_io.cpp
     src/chunker.cpp
+    src/huffman.cpp
 )
 
 target_include_directories(core PUBLIC
