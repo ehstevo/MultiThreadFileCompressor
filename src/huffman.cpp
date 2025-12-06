@@ -29,7 +29,6 @@ void Huffman::buildHuffmanTree() {
     std::priority_queue<HuffmanNode*, std::vector<HuffmanNode*>, HuffmanNode::Compare> min_heap;
 
     //Create leaf nodes and store them in owned_nodes
-    std::vector<std::unique_ptr<HuffmanNode>> owned_nodes;
     owned_nodes.clear();
 
     for (const auto& [byte, freq] : frequency_table) {
@@ -51,7 +50,7 @@ void Huffman::buildHuffmanTree() {
 
     // Build the Huffman tree
     while (min_heap.size() > 1) {
-        HuffmanNode* left = min_heap.top();  
+        HuffmanNode* left = min_heap.top(); 
         min_heap.pop();
 
         HuffmanNode* right = min_heap.top(); 
@@ -73,8 +72,32 @@ void Huffman::buildHuffmanTree() {
         owned_nodes.push_back(std::move(parent));
     }
 
-    // 3. The remaining element is the root
+    // The remaining element is the root
     root = min_heap.top();
+}
+
+void Huffman::generateCodes(HuffmanNode* node, std::string& current) {
+    if (!node) return;
+
+    // Leaf node: store the code
+    if (!node->left && !node->right) {
+        // handles 1 character case
+        if (current.empty()) {
+            current.push_back('0');
+        }
+        huffman_codes[node->byte] = current;
+        return;
+    }
+
+    // Traverse left = add '0'
+    current.push_back('0');
+    generateCodes(node->left, current);
+    current.pop_back();
+
+    // Traverse right = add '1'
+    current.push_back('1');
+    generateCodes(node->right, current);
+    current.pop_back();
 }
 
 // override compression interface functions

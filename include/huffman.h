@@ -7,6 +7,7 @@
 #include <string>
 #include <memory>
 #include <queue>
+#include <iostream>
 
 struct HuffmanNode {
     uint8_t byte;
@@ -61,6 +62,7 @@ class Huffman : public Compressor {
     private:
 
     HuffmanNode* root;
+    std::vector<std::unique_ptr<HuffmanNode>> owned_nodes;
     std::unordered_map<uint8_t, int> frequency_table;
     std::unordered_map<uint8_t, std::string> huffman_codes;
 
