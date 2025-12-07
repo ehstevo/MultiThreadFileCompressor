@@ -154,3 +154,77 @@ TEST(HuffmanTest, SkewedFrequenciesProduceCorrectTreeDepths) {
     EXPECT_LT(codes['A'].size(), codes['D'].size());
 }
 
+TEST(HuffmanTest, EncodeSimpleString) {
+    std::vector<uint8_t> data = { 'A', 'A', 'B' };
+    Huffman h;
+
+    h.buildFrequencyTable(data);
+    h.buildHuffmanTree();
+    std::string start;
+    h.generateCodes(h.getRoot(), start);
+
+    auto encoded = h.encodeData(data);
+    // std::cout << static_cast<int>(encoded.bits[0]) << std::endl;
+
+    // The original is 3 bytes = 24 bits
+    // The encoded version should be 3 bits → packed into 1 byte.
+    ASSERT_EQ(encoded.bits.size(), 1);
+    ASSERT_EQ(encoded.padding, 5);
+
+    uint8_t byte = encoded.bits[0];
+
+    // Code mappings may differ between A=0/B=1 or A=1/B=0.
+    // So check "either case".
+    bool case1 = ((byte & 0b11100000) >> 5) == 0b001; // A=0,A=0,B=1 pattern
+    bool case2 = ((byte & 0b11100000) >> 5) == 0b110; // A=1,A=1,B=0 pattern
+
+    ASSERT_TRUE(case1 || case2);
+}
+
+TEST(HuffmanTest, EncodeSingleSymbol) {
+    std::vector<uint8_t> data = { 'A','A','A','A','A','A' };
+    Huffman h;
+
+    h.buildFrequencyTable(data);
+    h.buildHuffmanTree();
+    std::string start;
+    h.generateCodes(h.getRoot(), start);
+
+    auto encoded = h.encodeData(data);
+
+    // 6 bits → still fits in 1 byte
+    ASSERT_EQ(encoded.bits.size(), 1);
+    ASSERT_EQ(encoded.padding, 2);
+
+    // That byte should have first 6 bits = either 000000 or 111111
+    uint8_t byte = encoded.bits[0];
+
+    bool allZeros = ((byte >> 2) == 0x00);
+    bool allOnes  = ((byte >> 2) == 0x3F);
+
+    ASSERT_TRUE(allZeros || allOnes);
+}
+
+TEST(HuffmanTest, EncodeLongerString) {
+    std::vector<uint8_t> data = { 'A','B','C','A','B','C','A','B','C' };
+    Huffman h;
+
+    h.buildFrequencyTable(data);
+    h.buildHuffmanTree();
+    std::string start;
+    h.generateCodes(h.getRoot(), start);
+
+    auto encoded = h.encodeData(data);
+
+    ASSERT_FALSE(encoded.bits.empty());
+    ASSERT_LT(encoded.bits.size(), data.size());
+}
+
+TEST(HuffmanTest, EncodeEmptyInput) {
+    std::vector<uint8_t> data = {};
+    Huffman h;
+
+    auto encoded = h.encodeData(data);
+
+    ASSERT_TRUE(encoded.bits.empty());
+}

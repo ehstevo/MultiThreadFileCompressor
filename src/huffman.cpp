@@ -100,6 +100,47 @@ void Huffman::generateCodes(HuffmanNode* node, std::string& current) {
     current.pop_back();
 }
 
+EncodedData Huffman::encodeData(const std::vector<uint8_t>& chunk) {
+    EncodedData result;
+
+    uint8_t current_byte = 0;
+    unsigned int bit_count = 0;
+
+    // loop through all original bytes
+    for (const auto& chunk_byte : chunk) {
+        std::string bit_string = huffman_codes[chunk_byte];
+
+        // compress original bytes according to huffman codes
+        for (size_t i=0; i<bit_string.length(); ++i) {
+            // byte is full so send to output vector
+            if (bit_count==7) {
+                if (bit_string[i]=='1') {
+                    current_byte |= 1;
+                }
+                result.bits.push_back(current_byte);
+                current_byte = 0;
+                bit_count = 0;
+            }
+            // add low or high bit to compressed data and shift current_byte to next bit
+            else {
+                if (bit_string[i]=='1') {
+                    current_byte |= 1;
+                }
+                current_byte <<= 1;
+                bit_count++;
+            }
+        }
+    }
+    // leftover bits
+    if (bit_count > 0) {
+        // subtract 1 because current byte it always shifted one ahead of bit count
+        current_byte <<= (8 - bit_count - 1);
+        result.bits.push_back(current_byte);
+        result.padding = 8 - bit_count;
+    }
+    return result;
+}
+
 // override compression interface functions
 std::vector<uint8_t> Huffman::compress(const std::vector<uint8_t>& chunk) {
     return chunk;

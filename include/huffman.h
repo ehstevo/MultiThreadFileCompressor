@@ -27,6 +27,11 @@ struct HuffmanNode {
     };
 };
 
+struct EncodedData {
+    std::vector<uint8_t> bits;
+    uint8_t padding;   // how many extra bits were added to final byte
+};
+
 class Huffman : public Compressor {
     public:
 
@@ -46,7 +51,7 @@ class Huffman : public Compressor {
     void generateCodes(HuffmanNode* node, std::string& current);
 
     // produces the compressed huffman coding of the uncompressed chunk
-    std::vector<uint8_t> encodeData(const std::vector<uint8_t>& chunk, std::unordered_map<uint8_t, std::string> codes);
+    EncodedData encodeData(const std::vector<uint8_t>& chunk);
 
     // transforms the compressed data back to the original based on the generated huffman codes
     std::vector<uint8_t> decodeData(const std::vector<uint8_t>& chunk, const std::unique_ptr<HuffmanNode> root, size_t original_size);
