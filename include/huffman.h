@@ -54,7 +54,7 @@ class Huffman : public Compressor {
     EncodedData encodeData(const std::vector<uint8_t>& chunk);
 
     // transforms the compressed data back to the original based on the generated huffman codes
-    std::vector<uint8_t> decodeData(const std::vector<uint8_t>& chunk, const std::unique_ptr<HuffmanNode> root, size_t original_size);
+    std::vector<uint8_t> decodeData(EncodedData& data);
 
     void serializeTree(const HuffmanNode* node, std::vector<uint8_t>& out);
     std::unique_ptr<HuffmanNode> deserializeTree(const std::vector<uint8_t>& data, size_t& index);

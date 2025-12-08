@@ -228,3 +228,72 @@ TEST(HuffmanTest, EncodeEmptyInput) {
 
     ASSERT_TRUE(encoded.bits.empty());
 }
+
+TEST(HuffmanTest, BasicRoundTrip) {
+    Huffman h;
+
+    std::vector<uint8_t> input = {
+        'a','b','a','a','c','b','d','d','d'
+    };
+
+    h.buildFrequencyTable(input);
+    h.buildHuffmanTree();
+    std::string start;
+    h.generateCodes(h.getRoot(), start);  
+
+    auto encoded = h.encodeData(input);
+    auto decoded = h.decodeData(encoded);
+
+    ASSERT_EQ(decoded, input);
+}
+
+TEST(HuffmanTest, SingleCharacterInput) {
+    Huffman h;
+
+    std::vector<uint8_t> input(100, 'x'); // 100 x's
+
+    h.buildFrequencyTable(input);
+    h.buildHuffmanTree();
+    std::string start;
+    h.generateCodes(h.getRoot(), start);
+
+    auto encoded = h.encodeData(input);
+    auto decoded = h.decodeData(encoded);
+
+    ASSERT_EQ(decoded, input);
+}
+
+TEST(HuffmanTest, RandomDataRoundTrip) {
+    Huffman h;
+    std::vector<uint8_t> input(10'000);
+
+    for (size_t i = 0; i < input.size(); ++i) {
+        input[i] = static_cast<uint8_t>(rand() % 256);
+    }
+
+    h.buildFrequencyTable(input);
+    h.buildHuffmanTree();
+    std::string start;
+    h.generateCodes(h.getRoot(), start);
+
+    auto encoded = h.encodeData(input);
+    auto decoded = h.decodeData(encoded);
+
+    ASSERT_EQ(decoded, input);
+}
+
+TEST(HuffmanTest, HandlesNonByteAlignedData) {
+    Huffman h;
+
+    std::vector<uint8_t> input = {'a','b','c'};
+
+    h.buildFrequencyTable(input);
+    h.buildHuffmanTree();
+    std::string start;
+    h.generateCodes(h.getRoot(), start);
+
+    auto encoded = h.encodeData(input);
+    auto decoded = h.decodeData(encoded);
+
+    ASSERT_EQ(decoded, input);
+}

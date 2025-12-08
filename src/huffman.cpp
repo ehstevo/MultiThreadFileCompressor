@@ -141,6 +141,66 @@ EncodedData Huffman::encodeData(const std::vector<uint8_t>& chunk) {
     return result;
 }
 
+std::vector<uint8_t> Huffman::decodeData(EncodedData& data) {
+    std::vector<uint8_t> out;
+    uint8_t bit_count = 0;
+    HuffmanNode* current_node = root;
+
+    for (size_t i=0; i<data.bits.size(); ++i) {
+        uint8_t current_byte = data.bits[i];
+        // if last byte decode until we reach padding
+        if (i==data.bits.size()-1) {
+            while (bit_count < (8 - data.padding)) {
+                while (current_node->left && current_node->right && (bit_count < (8 - data.padding))) {
+                    int choice = 0b10000000 & current_byte;
+                    current_byte <<= 1;
+                    if (choice) {
+                        current_node = current_node->right;
+                    }
+                    else {
+                        current_node = current_node->left;
+                    }
+                    bit_count++;
+                }
+                if (bit_count < (8 - data.padding) || (!current_node->left || !current_node->right)) {
+                    out.push_back(current_node->byte);
+                    // handles edge case where root is the only node
+                    if (current_node==root) {
+                        bit_count++;
+                    }
+                    current_node = root;
+                }
+            }
+        }
+        // else decode until we reach end of byte
+        else {
+            while (bit_count < 8) {
+                while (current_node->left && current_node->right && (bit_count < 8)) {
+                    int choice = 0b10000000 & current_byte;
+                    current_byte <<= 1;
+                    if (choice) {
+                        current_node = current_node->right;
+                    }
+                    else {
+                        current_node = current_node->left;
+                    }
+                    bit_count++;
+                }
+                if (bit_count < 8 || (!current_node->left || !current_node->right)) {
+                    out.push_back(current_node->byte);
+                    // handles edge case where root is the only node
+                    if (current_node==root) {
+                        bit_count++;
+                    }
+                    current_node = root;
+                }
+            }
+            bit_count = 0;
+        }
+    }
+    return out;
+}
+
 // override compression interface functions
 std::vector<uint8_t> Huffman::compress(const std::vector<uint8_t>& chunk) {
     return chunk;
