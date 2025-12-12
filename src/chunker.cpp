@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <iostream>
 
-std::vector<Chunk> Chunker::split(const std::vector<uint8_t>& input) {
+std::vector<Chunker::Chunk> Chunker::split(const std::vector<uint8_t>& input) {
     std::vector<Chunk> chunks;
     if (input.empty()) {
         return chunks;

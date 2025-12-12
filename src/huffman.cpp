@@ -100,7 +100,7 @@ void Huffman::generateCodes(HuffmanNode* node, std::string& current) {
     current.pop_back();
 }
 
-EncodedData Huffman::encodeData(const std::vector<uint8_t>& chunk) {
+Compressor::EncodedData Huffman::encodeData(const std::vector<uint8_t>& chunk) {
     EncodedData result;
 
     uint8_t current_byte = 0;
@@ -202,9 +202,17 @@ std::vector<uint8_t> Huffman::decodeData(EncodedData& data) {
 }
 
 // override compression interface functions
-std::vector<uint8_t> Huffman::compress(const std::vector<uint8_t>& chunk) {
-    return chunk;
+ Compressor::EncodedData Huffman::compress(const std::vector<uint8_t>& chunk) {
+    buildFrequencyTable(chunk);
+    buildHuffmanTree();
+    std::string start;
+    generateCodes(getRoot(), start);
+
+    auto encoded = encodeData(chunk);
+    return encoded;
 }
-std::vector<uint8_t> Huffman::decompress(const std::vector<uint8_t>& chunk) {
-    return chunk;
+
+std::vector<uint8_t> Huffman::decompress(Compressor::EncodedData& chunk) {
+    auto decoded = decodeData(chunk);
+    return decoded;
 }

@@ -297,3 +297,17 @@ TEST(HuffmanTest, HandlesNonByteAlignedData) {
 
     ASSERT_EQ(decoded, input);
 }
+
+TEST(HuffmanTest, RandomDataRoundTripFullTest) {
+    Huffman h;
+    std::vector<uint8_t> input(10'000);
+
+    for (size_t i = 0; i < input.size(); ++i) {
+        input[i] = static_cast<uint8_t>(rand() % 256);
+    }
+
+    auto encoded = h.compress(input);
+    auto decoded = h.decompress(encoded);
+
+    ASSERT_EQ(decoded, input);
+}

@@ -1,8 +1,4 @@
-#pragma once
-
 #include "compressor.h"
-#include <vector>
-#include <cstdint>
 #include <unordered_map>
 #include <string>
 #include <memory>
@@ -27,19 +23,14 @@ struct HuffmanNode {
     };
 };
 
-struct EncodedData {
-    std::vector<uint8_t> bits;
-    uint8_t padding;   // how many extra bits were added to final byte
-};
-
 class Huffman : public Compressor {
     public:
 
     Huffman() = default;
     ~Huffman() = default;
     // override compression interface functions
-    virtual std::vector<uint8_t> compress(const std::vector<uint8_t>& chunk) override;
-    virtual std::vector<uint8_t> decompress(const std::vector<uint8_t>& chunk) override;
+    virtual EncodedData compress(const std::vector<uint8_t>& chunk) override;
+    virtual std::vector<uint8_t> decompress(EncodedData& chunk) override;
 
     // build table mapping frequencies of each byte
     void buildFrequencyTable(const std::vector<uint8_t>& chunk);
